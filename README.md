@@ -14,29 +14,26 @@ Small X11 clipboard history tools with fzf picker and pinned entries.
 
 ## Dependencies
 
+Required shell:
+- Bash
+
 Required commands:
-- `bash`
-- `xclip`
 - `clipnotify`
+- `xclip`
+- `sha256sum`
+- `find`
+- `wc`
+- `clip-list`
 - `fzf`
+- `clip-toggle-pin`
+- `clip-delete`
 - `xdotool`
 - `alacritty`
-- `sha256sum`
 
 Optional commands:
 - `xseticon` - sets the clip picker window icon
 
-Check required commands in your shell:
-
-```bash
-need() {
-    command -v "$1" >/dev/null || echo "missing: $1"
-}
-
-for cmd in bash xclip clipnotify fzf xdotool alacritty sha256sum; do
-    need "$cmd"
-done
-```
+The executable scripts call `need` for required commands before using them.
 
 ## Install
 

@@ -1,6 +1,17 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+need() {
+    command -v "$1" >/dev/null 2>&1 || {
+        printf '%s: missing required command: %s\n' "${0##*/}" "$1" >&2
+        exit 127
+    }
+}
+
+need xdotool
+need alacritty
+
+
 RUNTIME_DIR="${XDG_RUNTIME_DIR:-/tmp}"
 target_file="$RUNTIME_DIR/clip-pick-target-window"
 
