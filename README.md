@@ -1,4 +1,4 @@
-# clip-tools
+# tool_clipboard
 
 Standalone extraction from `workspace_archlinux_i3wm`.
 
