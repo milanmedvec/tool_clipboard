@@ -6,7 +6,12 @@ target_file="$RUNTIME_DIR/clip-pick-target-window"
 
 xdotool getactivewindow >"$target_file" 2>/dev/null || rm -f "$target_file"
 
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+clip_pick="${CLIP_PICK_CMD:-$script_dir/clip-pick}"
+
 exec alacritty --class clip-pick -e bash -c '
-    xseticon -id "$WINDOWID" "$HOME/.local/share/pixmaps/clip-pick.png"
-    exec ~/_workdir/workspace/bin/clip-pick
-'
+    if [[ -n "${WINDOWID:-}" ]] && command -v xseticon >/dev/null 2>&1; then
+        xseticon -id "$WINDOWID" "$HOME/.local/share/pixmaps/clip-pick.png" 2>/dev/null || true
+    fi
+    exec "$1"
+' _ "$clip_pick"

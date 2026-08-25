@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
 
-xclip -sel primary -o | xclip -sel clip
-
+xclip -selection primary -o | xclip -selection clipboard
