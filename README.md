@@ -44,6 +44,7 @@ clip-pick-launch
 ## Configuration
 
 - History is stored under `$HOME/.local/share/clip-history`.
+- Includes original project icon `share/pixmaps/clip-pick.png`; `install.sh` installs it to `${XDG_DATA_HOME:-$HOME/.local/share}/pixmaps/clip-pick.png`.
 
 ## Notes
 
