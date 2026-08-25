@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+DATA_DIR="$HOME/.local/share/clip-history/entries"
+PINNED_DIR="$HOME/.local/share/clip-history/pinned"
+
+mkdir -p "$DATA_DIR" "$PINNED_DIR"
+
+mapfile -t pinned < <(ls -t "$PINNED_DIR" 2>/dev/null)
+for hash in "${pinned[@]}"; do
+    [[ -f "$DATA_DIR/$hash" ]] || continue
+    preview="$(head -c 200 "$DATA_DIR/$hash" | tr '\n\t' '  ')"
+    printf '%s\t\xf0\x9f\x93\x8c %s\n' "$hash" "$preview"
+done
+
+mapfile -t files < <(ls -t "$DATA_DIR")
+for hash in "${files[@]}"; do
+    [[ -f "$PINNED_DIR/$hash" ]] && continue
+    preview="$(head -c 200 "$DATA_DIR/$hash" | tr '\n\t' '  ')"
+    printf '%s\t%s\n' "$hash" "$preview"
+done

@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+DATA_DIR="$HOME/.local/share/clip-history/entries"
+PINNED_DIR="$HOME/.local/share/clip-history/pinned"
+MAX_ENTRIES=500
+
+mkdir -p "$DATA_DIR" "$PINNED_DIR"
+rm -f "$DATA_DIR"/.tmp.* 2>/dev/null || true
+
+last_hash=""
+
+while clipnotify -s clipboard; do
+    tmpfile="$(mktemp "$DATA_DIR/.tmp.XXXXXX")"
+
+    if ! xclip -selection clipboard -o >"$tmpfile" 2>/dev/null; then
+        rm -f "$tmpfile"
+        continue
+    fi
+
+    if [[ ! -s "$tmpfile" ]]; then
+        rm -f "$tmpfile"
+        continue
+    fi
+
+    hash="$(sha256sum "$tmpfile" | cut -d' ' -f1)"
+
+    if [[ "$hash" == "$last_hash" ]]; then
+        rm -f "$tmpfile"
+        continue
+    fi
+    last_hash="$hash"
+
+    target="$DATA_DIR/$hash"
+    if [[ -e "$target" ]]; then
+        touch "$target"
+        rm -f "$tmpfile"
+    else
+        mv "$tmpfile" "$target"
+    fi
+
+    mapfile -t all_files < <(ls -t "$DATA_DIR")
+    unpinned=()
+    for f in "${all_files[@]}"; do
+        [[ -e "$PINNED_DIR/$f" ]] && continue
+        unpinned+=("$f")
+    done
+    if (( ${#unpinned[@]} > MAX_ENTRIES )); then
+        for ((i = MAX_ENTRIES; i < ${#unpinned[@]}; i++)); do
+            rm -f "$DATA_DIR/${unpinned[$i]}"
+        done
+    fi
+done

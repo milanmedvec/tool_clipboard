@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+DATA_DIR="$HOME/.local/share/clip-history/entries"
+
+if [[ ! -d "$DATA_DIR" ]] || [[ -z "$(ls -A "$DATA_DIR" 2>/dev/null)" ]]; then
+    echo "No clipboard history yet."
+    read -r -p "Press enter to close..."
+    exit 0
+fi
+
+PINNED_DIR="$HOME/.local/share/clip-history/pinned"
+pinned_count="$(find "$PINNED_DIR" -maxdepth 1 -type f 2>/dev/null | wc -l)"
+
+selection="$(clip-list | fzf --delimiter=$'\t' --with-nth=2.. --prompt='clip> ' \
+    --header='enter: copy    ctrl-p: pin/unpin    del: delete' \
+    --bind "load:pos($((pinned_count + 1)))" \
+    --bind 'ctrl-p:execute-silent(clip-toggle-pin {1})+reload(clip-list)' \
+    --bind 'del:execute-silent(clip-delete {1})+reload(clip-list)')" || exit 0
+
+[[ -z "$selection" ]] && exit 0
+
+hash="${selection%%$'\t'*}"
+xclip -selection clipboard <"$DATA_DIR/$hash"
+xclip -selection primary <"$DATA_DIR/$hash"
+touch "$DATA_DIR/$hash"
+
+RUNTIME_DIR="${XDG_RUNTIME_DIR:-/tmp}"
+target_file="$RUNTIME_DIR/clip-pick-target-window"
+
+if [[ -f "$target_file" ]]; then
+    target_win="$(cat "$target_file")"
+    rm -f "$target_file"
+
+    if xdotool windowactivate --sync "$target_win" 2>/dev/null; then
+        xdotool key --clearmodifiers shift+Insert
+    fi
+fi

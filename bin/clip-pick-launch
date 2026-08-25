@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+RUNTIME_DIR="${XDG_RUNTIME_DIR:-/tmp}"
+target_file="$RUNTIME_DIR/clip-pick-target-window"
+
+xdotool getactivewindow >"$target_file" 2>/dev/null || rm -f "$target_file"
+
+exec alacritty --class clip-pick -e bash -c '
+    xseticon -id "$WINDOWID" "$HOME/.local/share/pixmaps/clip-pick.png"
+    exec ~/_workdir/workspace/bin/clip-pick
+'

@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+hash="${1:?usage: clip-delete <hash>}"
+DATA_DIR="$HOME/.local/share/clip-history/entries"
+PINNED_DIR="$HOME/.local/share/clip-history/pinned"
+
+rm -f "$DATA_DIR/$hash" "$PINNED_DIR/$hash"

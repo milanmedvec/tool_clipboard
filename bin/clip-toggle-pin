@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+hash="${1:?usage: clip-toggle-pin <hash>}"
+PINNED_DIR="$HOME/.local/share/clip-history/pinned"
+mkdir -p "$PINNED_DIR"
+
+marker="$PINNED_DIR/$hash"
+if [[ -e "$marker" ]]; then
+    rm -f "$marker"
+else
+    touch "$marker"
+fi
